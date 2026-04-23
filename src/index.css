@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  
+  --color-brand-blue: #0f172a;
+  --color-brand-orange: #f97316;
+  --color-brand-gray: #64748b;
+  --color-brand-light: #f1f5f9;
+  
+  --radius-bento: 2rem;
+  --radius-bento-sm: 1.5rem;
+  --radius-bento-xs: 0.75rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-sans text-slate-900 antialiased bg-slate-100;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight text-slate-900;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 md:px-8;
+  }
+  
+  .btn-primary {
+    @apply px-5 py-2.5 bg-brand-orange text-white font-bold rounded-xl shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600 hover:scale-[1.02] active:scale-95 text-sm;
+  }
+  
+  .btn-outline {
+    @apply px-5 py-2.5 border border-slate-200 text-slate-600 bg-white font-bold rounded-xl transition-all hover:bg-slate-50 hover:border-slate-300 hover:scale-[1.02] active:scale-95 text-sm;
+  }
+  
+  .bento-card {
+    @apply bg-white rounded-[2rem] border border-slate-200 p-6 md:p-8 shadow-sm transition-all hover:shadow-md;
+  }
+  
+  .bento-card-dark {
+    @apply bg-slate-900 text-white rounded-[2rem] border border-slate-800 p-6 md:p-8 shadow-xl;
+  }
+
+  .section-padding {
+    @apply py-6 md:py-8;
+  }
+}
