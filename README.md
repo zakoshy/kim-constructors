@@ -1,20 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Kim Constructors Website
 
-# Run and deploy your AI Studio app
+A modern, responsive, and professional landing page for **Kim Constructors**, a premier construction and finishing brand based in **Changara, Kenya**.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/3b0c4080-1eee-465a-816f-13044e34acfb
+- **Bento Grid Design**: A sophisticated, modular layout that presents company information in high-density, visually distinct tiles.
+- **Service Showcase**: High-impact visual grid highlighting expertise in architectural design, painting, plumbing, tiling, and more.
+- **Interactive Contact Hub**: Centralized communication area with a "Quick Inquiry" form and direct contact details side-by-side.
+- **Floating WhatsApp Bridge**: One-click accessibility for clients to chat directly with the Kim Constructors team.
+- **Responsive & Animated**: Fully adaptive for mobile, tablet, and desktop, with fluid entrance animations and hover states.
+- **Modern Tech Stack**: Built using React 18, TypeScript, Tailwind CSS 4, Motion, and Lucide React.
 
-## Run Locally
+## Project Structure
 
-**Prerequisites:**  Node.js
+- `src/App.tsx`: The main application entry point containing the Bento layout and components.
+- `src/index.css`: Global styles and Tailwind configuration for the Bento aesthetic.
+- `metadata.json`: Application metadata used by the hosting environment.
 
+## Contact Information
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **HQ Location**: Changara, Kenya
+- **Phone**: +254716970377
+- **Email**: contact@kimconstruct.com
+
+## Development
+
+To run the project locally:
+
+1. Install dependencies: `npm install`
+2. Start the dev server: `npm run dev`
+3. Build for production: `npm run build`
+
+---
+*Building Excellence, Crafting Perfection.*
