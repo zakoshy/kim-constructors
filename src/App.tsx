@@ -1,8 +1,10 @@
+/// <reference types="vite/client" />
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { 
   Building2, 
@@ -20,13 +22,56 @@ import {
   Instagram, 
   Linkedin, 
   Twitter,
+  Music,
+  MessageCircle,
   Menu, 
   X,
   ChevronRight,
   ArrowRight,
-  Play
+  Play,
+  Plus,
+  Trash2,
+  Image as ImageIcon,
+  LogOut,
+  Settings,
+  Maximize2,
+  Video,
+  MessageSquare,
+  LogIn,
+  UserPlus,
+  Lock,
+  Eye,
+  EyeOff
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { supabase } from "./lib/supabase";
+
+// --- Types ---
+
+interface ExpertiseCategory {
+  id: string;
+  label: string;
+  img: string;
+  accent?: boolean;
+  dark?: boolean;
+  description?: string;
+}
+
+interface ExpertiseImage {
+  id: string;
+  category_id: string;
+  url: string;
+  alt: string;
+  created_at?: string;
+}
+
+const DEFAULT_CATEGORIES: ExpertiseCategory[] = [
+  { id: "AD", label: "Architectural\nDesign", img: "https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&q=80&w=400", description: "Modern structural designs and blueprints." },
+  { id: "PF", label: "Painting &\nFinishing", img: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=400", accent: true, description: "Professional surface finishing and exterior/interior painting." },
+  { id: "PI", label: "Plumbing\nInstallation", img: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&q=80&w=400", description: "Industrial and residential piping and drainage systems." },
+  { id: "TW", label: "Tiling &\nFloor Works", img: "https://images.unsplash.com/photo-1516503562468-9b98563f6482?auto=format&fit=crop&q=80&w=400", description: "Master-level tiling and flooring solutions." },
+  { id: "GC", label: "Gypsum\nCeilings", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=400", description: "Decorative gypsum ceilings and lighting integration." },
+  { id: "+", label: "Renovations &\nRemodeling", img: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=400", dark: true, description: "Complete building restoration and modern upgrades." },
+];
 
 // --- Components ---
 
@@ -61,7 +106,7 @@ const Navbar = () => {
             </div>
           </div>
           <span className="text-lg font-display font-extrabold uppercase tracking-tight text-slate-900">
-            Kim <span className="text-brand-orange">Constructors</span>
+            Kim <span className="text-brand-orange">Contractors</span>
           </span>
         </a>
 
@@ -118,7 +163,561 @@ const Navbar = () => {
   );
 };
 
-const BentoHero = () => {
+const CategoryGallery = ({ category, onBack }: { category: ExpertiseCategory, onBack: () => void }) => {
+  const [images, setImages] = useState<ExpertiseImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('expertise_images')
+          .select('*')
+          .eq('category_id', category.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        setImages(data || []);
+      } catch (err) {
+        console.error("Error fetching images:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, [category.id]);
+
+  return (
+    <div className="pt-24 min-h-screen">
+      <div className="flex items-center gap-4 mb-8">
+        <button onClick={onBack} className="p-2 bg-white rounded-full shadow-sm hover:scale-110 transition-transform">
+          <ArrowRight className="rotate-180" size={20} />
+        </button>
+        <div>
+          <h2 className="text-3xl font-extrabold text-slate-900 uppercase tracking-tight">{category.label.replace('\n', ' ')}</h2>
+          <p className="text-slate-500 text-sm">{category.description}</p>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="aspect-square bg-slate-200 animate-pulse rounded-2xl" />
+          ))}
+        </div>
+      ) : images.length === 0 ? (
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+          <ImageIcon className="mx-auto text-slate-300 mb-4" size={48} />
+          <p className="text-slate-500 font-medium">No projects showcase available for this section yet.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {images.map((img) => (
+            <motion.div 
+              key={img.id}
+              whileHover={{ scale: 1.02 }}
+              onClick={() => setSelectedImage(img.url)}
+              className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm"
+            >
+              <img src={img.url} alt={img.alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                <Maximize2 className="text-white opacity-0 group-hover:opacity-100 transition-opacity" size={24} />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button className="absolute top-8 right-8 text-white p-2 hover:bg-white/10 rounded-full transition-colors">
+            <X size={32} />
+          </button>
+          <motion.img 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            src={selectedImage} 
+            className="max-w-full max-h-full object-contain shadow-2xl rounded-lg"
+            alt="Full view" 
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => void, isAuthorized: boolean, setIsAuthorized: (v: boolean) => void }) => {
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [email, setEmail] = useState("kimcontractors2@gmail.com");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORIES[0].id);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [newImageAlt, setNewImageAlt] = useState("");
+  const [images, setImages] = useState<ExpertiseImage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, url: string } | null>(null);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      if (!supabase) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthorized(true);
+      }
+    };
+    checkUser();
+  }, [setIsAuthorized]);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase) {
+      alert("Supabase not configured. Check .env file.");
+      return;
+    }
+    setAuthLoading(true);
+
+    try {
+      if (authMode === 'login') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        setIsAuthorized(true);
+      } else {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        alert("Signup successful! Please check your email for verification.");
+        setAuthMode('login');
+      }
+    } catch (err: any) {
+      alert(err.message || "Authentication failed");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (supabase) await supabase.auth.signOut();
+    setIsAuthorized(false);
+    onExit();
+  };
+
+  useEffect(() => {
+    if (isAuthorized) {
+      fetchImages();
+    }
+  }, [isAuthorized, selectedCategory]);
+
+  const fetchImages = async () => {
+    if (!supabase) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('expertise_images')
+        .select('*')
+        .eq('category_id', selectedCategory)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setImages(data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddImage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFile || !supabase) {
+      alert("Please select a file first.");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // 1. Upload to Supabase Storage
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${selectedCategory}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('projects')
+        .upload(filePath, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      // 2. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('projects')
+        .getPublicUrl(filePath);
+
+      // 3. Save to Database
+      const { error: dbError } = await supabase.from('expertise_images').insert([
+        { category_id: selectedCategory, url: publicUrl, alt: newImageAlt || "Expertise project" }
+      ]);
+
+      if (dbError) throw dbError;
+
+      setSelectedFile(null);
+      setNewImageAlt("");
+      fetchImages();
+      
+      // Reset file input
+      const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
+
+    } catch (err: any) {
+      console.error(err);
+      let message = "Upload failed.";
+      if (err.message?.includes("row-level security")) {
+        message = "Permission Denied: Ensure you ran the SQL policies for the 'projects' bucket and created it in Supabase Storage.";
+      } else if (err.status === 400 || err.status === 404) {
+        message = "Bucket 'projects' not found. Please create it manually in your Supabase Storage dashboard.";
+      }
+      alert(message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!deleteConfirm || !supabase) return;
+    try {
+      // Extract file path from URL if possible, or just delete from DB
+      // For simplicity, we just delete the DB record here
+      // To also delete from storage, you'd need the path
+      const { error } = await supabase.from('expertise_images').delete().eq('id', deleteConfirm.id);
+      if (error) throw error;
+      fetchImages();
+      setDeleteConfirm(null);
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting image.");
+    }
+  };
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 py-32">
+        <form onSubmit={handleAuth} className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-200">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
+              {authMode === 'login' ? <Lock className="text-white" size={32} /> : <UserPlus className="text-white" size={32} />}
+            </div>
+          </div>
+          <h2 className="text-3xl font-extrabold text-center text-slate-900 mb-2 font-display uppercase tracking-tight">
+            {authMode === 'login' ? 'Portal Login' : 'Admin Signup'}
+          </h2>
+          <p className="text-center text-slate-500 text-sm mb-8">
+            {authMode === 'login' ? 'Secure access for Kim Contractors staff' : 'Register a new administrative account'}
+          </p>
+          
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase font-bold text-slate-400 ml-4 tracking-widest">Administrative Email</label>
+              <input 
+                type="email" 
+                placeholder="Email Address" 
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase font-bold text-slate-400 ml-4 tracking-widest">Secret Password</label>
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="Password" 
+                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium pr-12"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+            
+            <button 
+              disabled={authLoading}
+              className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl flex items-center justify-center gap-2 group"
+            >
+              {authLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  {authMode === 'login' ? 'Enter Dashboard' : 'Confirm Signup'}
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+            
+            <div className="flex flex-col gap-2 pt-4">
+              <button 
+                type="button" 
+                onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
+                className="text-slate-500 text-xs font-bold hover:text-brand-orange transition-colors"
+              >
+                {authMode === 'login' ? "Need an account? Sign up here" : "Already have an account? Login here"}
+              </button>
+              <button type="button" onClick={onExit} className="w-full py-2 text-slate-400 text-xs font-bold underline decoration-dotted">Back to Site</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  const currentCategory = DEFAULT_CATEGORIES.find(c => c.id === selectedCategory);
+
+  return (
+    <div className="flex flex-col md:flex-row h-screen bg-slate-50 overflow-hidden">
+      {/* Sidebar Overlay for Mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Navigation */}
+      <aside 
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 md:relative md:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="h-full flex flex-col p-6">
+          <div className="flex items-center gap-3 mb-10 px-2">
+            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+              <Building2 className="text-white" size={18} />
+            </div>
+            <div>
+              <h1 className="font-extrabold text-sm text-slate-900 uppercase tracking-tighter">Kim Admin</h1>
+              <span className="text-[9px] font-bold text-slate-400 tracking-[0.2em] uppercase">Control Panel</span>
+            </div>
+          </div>
+
+          <nav className="flex-1 space-y-1 overflow-y-auto pr-2">
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4 ml-2">Gallery Sections</p>
+            {DEFAULT_CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setSelectedCategory(cat.id);
+                  setIsSidebarOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold text-xs text-left transition-all ${
+                  selectedCategory === cat.id 
+                  ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10" 
+                  : "bg-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full shrink-0 ${selectedCategory === cat.id ? "bg-brand-orange" : "bg-slate-200"}`} />
+                {cat.label.replace('\n', ' ')}
+              </button>
+            ))}
+          </nav>
+
+          <div className="mt-8 pt-6 border-t border-slate-100">
+             <button 
+              onClick={handleLogout} 
+              className="w-full flex items-center gap-3 px-4 py-4 bg-red-50 text-red-600 rounded-2xl font-bold text-xs hover:bg-red-100 transition-all group"
+            >
+              <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" /> 
+              Exit Session
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        {/* Mobile Header */}
+        <header className="md:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 sticky top-0 z-30">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 text-slate-600 active:bg-slate-100 rounded-xl"
+          >
+            <Menu size={24} />
+          </button>
+          <span className="font-extrabold text-[10px] uppercase tracking-widest text-slate-400">Dashboard</span>
+          <div className="w-10 h-10 rounded-full bg-slate-100" />
+        </header>
+
+        <div className="p-4 md:p-10 max-w-6xl mx-auto w-full">
+          {/* Dashboard Header */}
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="px-2 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-bold uppercase rounded-md">Live Platform</div>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 uppercase tracking-tighter leading-none mb-4">
+              Editing: {currentCategory?.label.replace('\n', ' ')}
+            </h2>
+            <p className="text-slate-500 text-sm max-w-2xl font-medium">Manage the image gallery for this section. Add quality project photos to showcase your expertise.</p>
+          </div>
+
+          <div className="grid lg:grid-cols-12 gap-8">
+            {/* Upload Form */}
+            <div className="lg:col-span-5">
+              <form onSubmit={handleAddImage} className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-sm sticky top-10">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-3 bg-brand-orange/10 rounded-2xl text-brand-orange">
+                    <Plus size={24} />
+                  </div>
+                  <h3 className="font-extrabold text-lg text-slate-900 uppercase">New Media</h3>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 ml-4 tracking-widest">Select Image from Device</label>
+                    <div className="relative group/upload">
+                      <input 
+                        id="file-upload"
+                        type="file" 
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                      />
+                      <label 
+                        htmlFor="file-upload"
+                        className={`w-full flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all ${
+                          selectedFile ? "border-brand-orange bg-brand-orange/5" : "border-slate-200 hover:border-brand-orange hover:bg-slate-100/50"
+                        }`}
+                      >
+                        <div className={`p-4 rounded-2xl mb-3 transition-colors ${selectedFile ? "bg-brand-orange text-white" : "bg-white text-slate-400 group-hover/upload:text-brand-orange shadow-sm"}`}>
+                          {selectedFile ? <ImageIcon size={28} /> : <Plus size={28} />}
+                        </div>
+                        <p className={`text-sm font-bold uppercase tracking-tight text-center ${selectedFile ? "text-slate-900" : "text-slate-500"}`}>
+                          {selectedFile ? selectedFile.name : "Tap to browse files"}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">JPG, PNG or WEBP (Max 5MB)</p>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 ml-4 tracking-widest">Project Description</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Modern living room finish..." 
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium"
+                      value={newImageAlt}
+                      onChange={(e) => setNewImageAlt(e.target.value)}
+                    />
+                  </div>
+
+                  <button 
+                    disabled={uploading || !selectedFile}
+                    className={`w-full py-5 rounded-3xl font-extrabold uppercase tracking-widest text-xs shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 ${
+                      uploading || !selectedFile 
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
+                      : "bg-brand-orange text-white hover:brightness-110 shadow-brand-orange/30"
+                    }`}
+                  >
+                    {uploading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>Push to Gallery <ArrowRight size={16} /></>
+                    )}
+                  </button>
+                  
+                  <p className="text-[10px] text-slate-400 text-center font-medium leading-relaxed">
+                    Uploaded images will be instantly visible to clients visiting the expertise section on the main site.
+                  </p>
+                </div>
+              </form>
+            </div>
+
+            {/* Gallery Grid */}
+            <div className="lg:col-span-7">
+              <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-200 min-h-[500px] shadow-sm">
+                <div className="flex items-center justify-between mb-10 border-b border-slate-50 pb-6">
+                  <h3 className="font-extrabold text-xl text-slate-900 uppercase">Current Inventory</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold text-slate-400 bg-slate-100 px-4 py-2 rounded-full uppercase tracking-widest">{images.length} Units</span>
+                  </div>
+                </div>
+
+                {loading ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-slate-100 animate-pulse rounded-3xl" />)}
+                  </div>
+                ) : images.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-24 text-slate-200">
+                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                      <ImageIcon size={40} className="opacity-20" />
+                    </div>
+                    <p className="font-extrabold uppercase tracking-widest text-xs text-slate-300">Catalog is Empty</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {images.map(img => (
+                      <div key={img.id} className="group relative aspect-[4/5] rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm transition-all hover:shadow-xl">
+                        <img src={img.url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={img.alt} />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6">
+                          <button 
+                            onClick={() => setDeleteConfirm({ id: img.id, url: img.url })}
+                            className="w-full py-4 bg-white text-red-600 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-2xl active:scale-95"
+                          >
+                            <Trash2 size={18} /> Remove Asset
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+          <div className="bg-white p-8 rounded-[2.5rem] max-w-sm w-full shadow-2xl border border-slate-200">
+            <div className="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6">
+              <Trash2 size={32} />
+            </div>
+            <h3 className="text-xl font-extrabold text-slate-900 uppercase mb-2">Confirm Delete</h3>
+            <p className="text-slate-500 text-sm mb-8 leading-relaxed font-medium">Are you absolutely sure you want to remove this project from the public gallery? This action is permanent.</p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={handleDeleteImage}
+                className="w-full py-4 bg-red-600 text-white rounded-2xl font-bold transition-all hover:bg-red-700 shadow-lg shadow-red-200"
+              >
+                Yes, Delete it
+              </button>
+              <button 
+                onClick={() => setDeleteConfirm(null)}
+                className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold transition-all hover:bg-slate-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCategory) => void }) => {
   return (
     <div className="grid grid-cols-12 gap-4 auto-rows-min mt-24">
       {/* Hero Body */}
@@ -149,7 +748,7 @@ const BentoHero = () => {
             transition={{ delay: 0.2 }}
             className="text-slate-400 text-lg max-w-xl"
           >
-            Kim Constructors offers expert architectural construction and premium finishing services for residential and commercial landmarks.
+            Kim Contractors offers expert architectural construction and premium finishing services for residential and commercial landmarks.
           </motion.p>
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -204,18 +803,12 @@ const BentoHero = () => {
           </a>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {[
-            { id: "AD", label: "Architectural\nDesign", img: "https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&q=80&w=400" },
-            { id: "PF", label: "Painting &\nFinishing", img: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=400", accent: true },
-            { id: "PI", label: "Plumbing\nInstallation", img: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&q=80&w=400" },
-            { id: "TW", label: "Tiling &\nFloor Works", img: "https://images.unsplash.com/photo-1516503562468-9b98563f6482?auto=format&fit=crop&q=80&w=400" },
-            { id: "GC", label: "Gypsum\nCeilings", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=400" },
-            { id: "+", label: "Renovations &\nRemodeling", img: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=400", dark: true },
-          ].map((s, i) => (
+          {DEFAULT_CATEGORIES.map((s, i) => (
             <motion.div 
               key={i}
               whileHover={{ scale: 1.02 }}
-              className={`group relative rounded-2xl h-32 overflow-hidden shadow-sm border ${s.accent ? "border-brand-orange/30" : "border-slate-100"}`}
+              onClick={() => onCategoryClick(s)}
+              className={`group relative rounded-2xl h-32 overflow-hidden shadow-sm border cursor-pointer ${s.accent ? "border-brand-orange/30" : "border-slate-100"}`}
             >
               <img src={s.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt={s.label} />
               <div className={`absolute inset-0 bg-gradient-to-t ${s.dark ? "from-black/90 via-black/40" : "from-slate-900/90 via-slate-900/40"} to-transparent p-4 flex flex-col justify-between`}>
@@ -273,7 +866,7 @@ const BentoHero = () => {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-0.5">Email</p>
-              <p className="text-xs font-bold">contact@kimconstruct.com</p>
+              <p className="text-xs font-bold">kimcontractors2@gmail.com</p>
             </div>
           </div>
         </div>
@@ -303,28 +896,26 @@ const BentoHero = () => {
   );
 };
 
-const Footer = () => {
+const Footer = ({ onAdminClick }: { onAdminClick: () => void }) => {
   return (
     <footer className="mt-8 mb-8">
-      <div className="container-custom bg-white rounded-2xl border border-slate-200 p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="container-custom bg-white rounded-2xl border border-slate-200 p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-sm">
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Follow us on</span>
-          <div className="flex gap-6">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Social Media</span>
+          <div className="flex gap-8">
             {[
-              { icon: <Facebook size={18} />, name: "Facebook" },
-              { icon: <Instagram size={18} />, name: "Instagram" },
-              { icon: <Linkedin size={18} />, name: "LinkedIn" },
-              { icon: <Twitter size={18} />, name: "Twitter" }
+              { name: "Facebook", link: "https://www.facebook.com/profile.php?id=100009546434745" },
+              { name: "TikTok", link: "https://vm.tiktok.com/ZS9NhdvxML9CH-B48Fw/" }
             ].map((social, idx) => (
-              <a key={idx} href="#" className="text-slate-400 hover:text-brand-orange transition-all hover:scale-110 active:scale-95" aria-label={social.name}>
-                {social.icon}
+              <a key={idx} href={social.link} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-brand-orange transition-all font-bold uppercase tracking-[0.15em] text-[10px] active:scale-95" aria-label={social.name}>
+                {social.name}
               </a>
             ))}
           </div>
         </div>
 
-        <div className="text-center md:text-right">
-           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">© 2026 Kim Constructors Ltd. | Building Excellence</span>
+        <div className="flex flex-col items-center md:items-end gap-2">
+           <span className="text-slate-400 text-[9px] font-bold uppercase tracking-[0.2em]">© 2026 Kim Contractors Ltd.</span>
         </div>
       </div>
     </footer>
@@ -334,9 +925,11 @@ const Footer = () => {
 // --- Main App ---
 
 const FloatingWhatsApp = () => {
+  const prefilledMessage = "Hello CEO of Kim Contractors, I am reaching out through your website and I am interested in your professional contracting services.";
+  
   return (
     <motion.a
-      href="https://wa.me/254716970377"
+      href={`https://wa.me/254716970377?text=${encodeURIComponent(prefilledMessage)}`}
       target="_blank"
       rel="noopener noreferrer"
       initial={{ scale: 0, opacity: 0 }}
@@ -354,14 +947,61 @@ const FloatingWhatsApp = () => {
 };
 
 export default function App() {
+  const [currentView, setCurrentView] = useState<'home' | 'admin' | 'category'>('home');
+  const [activeCategory, setActiveCategory] = useState<ExpertiseCategory | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    if (window.location.hash === '#admin') {
+      setCurrentView('admin');
+    }
+  }, []);
+
+  const handleCategoryClick = (cat: ExpertiseCategory) => {
+    setActiveCategory(cat);
+    setCurrentView('category');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView('home');
+    setActiveCategory(null);
+    if (window.location.hash === '#admin') {
+      window.history.replaceState(null, "", " ");
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // If we are in admin mode AND authorized, we show a completely different UI
+  if (currentView === 'admin' && isAuthorized) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <AdminPanel onExit={handleBackToHome} isAuthorized={isAuthorized} setIsAuthorized={setIsAuthorized} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 selection:bg-brand-orange/30">
       <Navbar />
-      <main className="container-custom pb-8">
-        <BentoHero />
+      <main className="container-custom pb-12">
+        {currentView === 'home' && <BentoHero onCategoryClick={handleCategoryClick} />}
+        
+        {currentView === 'category' && activeCategory && (
+          <CategoryGallery category={activeCategory} onBack={handleBackToHome} />
+        )}
+
+        {currentView === 'admin' && !isAuthorized && (
+          <AdminPanel onExit={handleBackToHome} isAuthorized={isAuthorized} setIsAuthorized={setIsAuthorized} />
+        )}
       </main>
-      <Footer />
-      <FloatingWhatsApp />
+      
+      {(currentView === 'home' || currentView === 'category') && (
+        <>
+          <Footer onAdminClick={() => setCurrentView('admin')} />
+          <FloatingWhatsApp />
+        </>
+      )}
     </div>
   );
 }

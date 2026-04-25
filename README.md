@@ -21,7 +21,7 @@ A modern, responsive, and professional landing page for **Kim Constructors**, a 
 
 - **HQ Location**: Changara, Kenya
 - **Phone**: +254716970377
-- **Email**: contact@kimconstruct.com
+- **Email**: kimcontractors2@gmail.com
 
 ## Development
 
