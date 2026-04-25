@@ -952,10 +952,22 @@ export default function App() {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (window.location.hash === '#admin') {
-      setCurrentView('admin');
-    }
-  }, []);
+    const handleHashChange = () => {
+      if (window.location.hash === '#admin') {
+        setCurrentView('admin');
+      } else if (window.location.hash === '' || window.location.hash === '#') {
+        if (currentView === 'admin') {
+          setCurrentView('home');
+        }
+      }
+    };
+
+    // Initial check
+    handleHashChange();
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [currentView]);
 
   const handleCategoryClick = (cat: ExpertiseCategory) => {
     setActiveCategory(cat);
