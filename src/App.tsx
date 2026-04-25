@@ -75,6 +75,11 @@ const DEFAULT_CATEGORIES: ExpertiseCategory[] = [
 
 // --- Components ---
 
+const socials = [
+  { name: "Facebook", link: "https://www.facebook.com/profile.php?id=100009546434745" },
+  { name: "TikTok", link: "https://vm.tiktok.com/ZS9NhdvxML9CH-B48Fw/" }
+];
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -96,18 +101,24 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-4 left-0 right-0 z-50 px-4">
-      <div className={`container-custom transition-all duration-300 rounded-2xl border border-slate-200 flex justify-between items-center px-6 py-3 ${
-        isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-white shadow-sm"
+      <div className={`container-custom transition-all duration-300 rounded-2xl border border-slate-200 flex justify-between items-center px-6 py-4 ${
+        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-white shadow-sm"
       }`}>
-        <a href="#" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center">
-            <div className="w-5 h-5 border-2 border-brand-orange rotate-45 flex items-center justify-center">
-              <span className="text-white font-bold -rotate-45 text-[10px]">K</span>
-            </div>
+        <a href="#" className="flex items-center gap-4 group">
+          <div className="w-28 h-28 relative overflow-hidden rounded-full border-4 border-slate-100 group-hover:border-brand-green transition-all duration-300 bg-white shadow-md -my-8">
+            <img 
+              src="/logo.jpeg" 
+              alt="Kim Contractors Logo" 
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-700" 
+            />
           </div>
-          <span className="text-lg font-display font-extrabold uppercase tracking-tight text-slate-900">
-            Kim <span className="text-brand-orange">Contractors</span>
-          </span>
+          <div className="flex flex-col">
+            <span className="text-3xl font-display font-extrabold uppercase tracking-tighter text-black leading-none">
+              Kim <span className="text-brand-green">Contractors</span>
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-500 mt-1">Excellence in Construction</span>
+          </div>
         </a>
 
         {/* Desktop Nav */}
@@ -116,7 +127,7 @@ const Navbar = () => {
             <a 
               key={link.name} 
               href={link.href} 
-              className="text-xs font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-brand-orange"
+              className="text-xs font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-brand-green"
             >
               {link.name}
             </a>
@@ -144,12 +155,7 @@ const Navbar = () => {
         >
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 flex flex-col gap-6 md:hidden">
             {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href} 
-                className="text-sm font-bold text-slate-900 uppercase tracking-widest"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <a key={link.name} href={link.href} className="text-sm font-bold text-black uppercase tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>
                 {link.name}
               </a>
             ))}
@@ -190,9 +196,9 @@ const CategoryGallery = ({ category, onBack }: { category: ExpertiseCategory, on
   }, [category.id]);
 
   return (
-    <div className="pt-24 min-h-screen">
+    <div className="pt-32 min-h-screen bg-white">
       <div className="flex items-center gap-4 mb-8">
-        <button onClick={onBack} className="p-2 bg-white rounded-full shadow-sm hover:scale-110 transition-transform">
+        <button onClick={onBack} className="p-3 bg-black text-white rounded-full shadow-lg hover:scale-110 transition-transform">
           <ArrowRight className="rotate-180" size={20} />
         </button>
         <div>
@@ -409,11 +415,11 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
       <div className="min-h-screen flex items-center justify-center p-4 py-32">
         <form onSubmit={handleAuth} className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-200">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center shadow-lg border-2 border-brand-green">
               {authMode === 'login' ? <Lock className="text-white" size={32} /> : <UserPlus className="text-white" size={32} />}
             </div>
           </div>
-          <h2 className="text-3xl font-extrabold text-center text-slate-900 mb-2 font-display uppercase tracking-tight">
+          <h2 className="text-3xl font-extrabold text-center text-black mb-2 font-display uppercase tracking-tight">
             {authMode === 'login' ? 'Portal Login' : 'Admin Signup'}
           </h2>
           <p className="text-center text-slate-500 text-sm mb-8">
@@ -426,7 +432,7 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
               <input 
                 type="email" 
                 placeholder="Email Address" 
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium"
+                className="w-full p-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-brand-green/20 transition-all font-medium"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -438,7 +444,7 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
                 <input 
                   type={showPassword ? "text" : "password"} 
                   placeholder="Password" 
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium pr-12"
+                  className="w-full p-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-brand-green/20 transition-all font-medium pr-12"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -455,7 +461,7 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
             
             <button 
               disabled={authLoading}
-              className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl flex items-center justify-center gap-2 group"
+              className="w-full py-4 bg-black text-white rounded-2xl font-bold hover:bg-brand-green transition-all shadow-xl flex items-center justify-center gap-2 group"
             >
               {authLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -471,7 +477,7 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
               <button 
                 type="button" 
                 onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
-                className="text-slate-500 text-xs font-bold hover:text-brand-orange transition-colors"
+                className="text-slate-500 text-xs font-bold hover:text-brand-green transition-colors"
               >
                 {authMode === 'login' ? "Need an account? Sign up here" : "Already have an account? Login here"}
               </button>
@@ -523,11 +529,11 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold text-xs text-left transition-all ${
                   selectedCategory === cat.id 
-                  ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10" 
-                  : "bg-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-black text-white shadow-xl shadow-black/10" 
+                  : "bg-transparent text-slate-500 hover:bg-slate-50 hover:text-black"
                 }`}
               >
-                <div className={`w-2 h-2 rounded-full shrink-0 ${selectedCategory === cat.id ? "bg-brand-orange" : "bg-slate-200"}`} />
+                <div className={`w-2 h-2 rounded-full shrink-0 ${selectedCategory === cat.id ? "bg-brand-green" : "bg-slate-200"}`} />
                 {cat.label.replace('\n', ' ')}
               </button>
             ))}
@@ -565,7 +571,7 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
             <div className="flex items-center gap-2 mb-2">
               <div className="px-2 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-bold uppercase rounded-md">Live Platform</div>
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 uppercase tracking-tighter leading-none mb-4">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-black uppercase tracking-tighter leading-none mb-4">
               Editing: {currentCategory?.label.replace('\n', ' ')}
             </h2>
             <p className="text-slate-500 text-sm max-w-2xl font-medium">Manage the image gallery for this section. Add quality project photos to showcase your expertise.</p>
@@ -576,10 +582,10 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
             <div className="lg:col-span-5">
               <form onSubmit={handleAddImage} className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-sm sticky top-10">
                 <div className="flex items-center gap-3 mb-8">
-                  <div className="p-3 bg-brand-orange/10 rounded-2xl text-brand-orange">
+                  <div className="p-3 bg-brand-green/10 rounded-2xl text-brand-green">
                     <Plus size={24} />
                   </div>
-                  <h3 className="font-extrabold text-lg text-slate-900 uppercase">New Media</h3>
+                  <h3 className="font-extrabold text-lg text-black uppercase">New Media</h3>
                 </div>
 
                 <div className="space-y-5">
@@ -599,7 +605,7 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
                           selectedFile ? "border-brand-orange bg-brand-orange/5" : "border-slate-200 hover:border-brand-orange hover:bg-slate-100/50"
                         }`}
                       >
-                        <div className={`p-4 rounded-2xl mb-3 transition-colors ${selectedFile ? "bg-brand-orange text-white" : "bg-white text-slate-400 group-hover/upload:text-brand-orange shadow-sm"}`}>
+                        <div className={`p-4 rounded-2xl mb-3 transition-colors ${selectedFile ? "bg-brand-green text-white" : "bg-white text-slate-400 group-hover/upload:text-brand-green shadow-sm"}`}>
                           {selectedFile ? <ImageIcon size={28} /> : <Plus size={28} />}
                         </div>
                         <p className={`text-sm font-bold uppercase tracking-tight text-center ${selectedFile ? "text-slate-900" : "text-slate-500"}`}>
@@ -626,7 +632,7 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
                     className={`w-full py-5 rounded-3xl font-extrabold uppercase tracking-widest text-xs shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 ${
                       uploading || !selectedFile 
                       ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
-                      : "bg-brand-orange text-white hover:brightness-110 shadow-brand-orange/30"
+                      : "bg-brand-green text-white hover:brightness-110 shadow-brand-green/30"
                     }`}
                   >
                     {uploading ? (
@@ -721,7 +727,7 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
   return (
     <div className="grid grid-cols-12 gap-4 auto-rows-min mt-24">
       {/* Hero Body */}
-      <section className="col-span-12 lg:col-span-8 bg-slate-900 rounded-[2rem] p-8 md:p-12 relative overflow-hidden flex flex-col justify-end border border-slate-800 min-h-[500px]">
+      <section className="col-span-12 lg:col-span-8 bg-black rounded-[2rem] p-8 md:p-12 relative overflow-hidden flex flex-col justify-end border border-white/5 min-h-[500px]">
         <div className="absolute top-0 right-0 p-12 opacity-5">
            <Building2 size={240} className="text-white" />
         </div>
@@ -729,7 +735,7 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
           <motion.span 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-block bg-brand-orange text-white text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full font-bold"
+            className="inline-block bg-brand-green text-white text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full font-bold"
           >
             Premier Construction Excellence
           </motion.span>
@@ -740,13 +746,13 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
             className="text-4xl md:text-6xl font-extrabold text-white leading-[1.1] uppercase"
           >
             Building Excellence, <br/>
-            <span className="text-brand-orange text-outline-white">Crafting Perfection</span>
+            <span className="text-brand-green">Crafting Perfection</span>
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-slate-400 text-lg max-w-xl"
+            className="text-white/60 text-lg max-w-xl font-medium"
           >
             Kim Contractors offers expert architectural construction and premium finishing services for residential and commercial landmarks.
           </motion.p>
@@ -756,7 +762,7 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
             transition={{ delay: 0.3 }}
             className="flex flex-wrap gap-4 pt-4"
           >
-            <a href="#services" className="bg-white text-slate-900 px-8 py-3 rounded-xl font-bold shadow-xl transition-transform hover:scale-105 active:scale-95">View Our Services</a>
+            <a href="#services" className="bg-white text-black px-8 py-3 rounded-xl font-bold shadow-xl transition-transform hover:scale-105 active:scale-95">View Our Services</a>
           </motion.div>
         </div>
       </section>
@@ -770,8 +776,8 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
           </p>
         </div>
         <div className="mt-auto space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-            <div className="w-10 h-10 bg-orange-100 text-brand-orange rounded-xl flex items-center justify-center text-xl font-bold italic shadow-inner">P</div>
+          <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm transition-all hover:shadow-md">
+            <div className="w-10 h-10 bg-green-100 text-brand-green rounded-xl flex items-center justify-center text-xl font-bold italic shadow-inner">P</div>
             <div className="text-xs text-slate-700 group">
               <p className="font-bold uppercase tracking-wide">Professional Craft</p>
               <p className="opacity-60 font-medium">Master-level attention to detail</p>
@@ -797,8 +803,8 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
       {/* Services Grid (Mini Bento) */}
       <section id="services" className="col-span-12 lg:col-span-6 bento-card">
         <div className="flex items-center justify-between mb-8">
-          <h3 className="font-bold text-xl uppercase text-slate-900 tracking-tight">Our Expertise</h3>
-          <a href="#" className="flex items-center gap-1 text-[10px] text-brand-orange font-bold uppercase tracking-widest hover:underline">
+          <h3 className="font-bold text-xl uppercase text-black tracking-tight">Our Expertise</h3>
+          <a href="#" className="flex items-center gap-1 text-[10px] text-brand-green font-bold uppercase tracking-widest hover:underline">
             Explore All <ArrowRight size={12} />
           </a>
         </div>
@@ -808,11 +814,11 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
               key={i}
               whileHover={{ scale: 1.02 }}
               onClick={() => onCategoryClick(s)}
-              className={`group relative rounded-2xl h-32 overflow-hidden shadow-sm border cursor-pointer ${s.accent ? "border-brand-orange/30" : "border-slate-100"}`}
+              className={`group relative rounded-2xl h-32 overflow-hidden shadow-sm border cursor-pointer ${s.accent ? "border-brand-green/30" : "border-slate-100"}`}
             >
               <img src={s.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt={s.label} />
-              <div className={`absolute inset-0 bg-gradient-to-t ${s.dark ? "from-black/90 via-black/40" : "from-slate-900/90 via-slate-900/40"} to-transparent p-4 flex flex-col justify-between`}>
-                <div className={`${s.dark ? "bg-brand-orange" : "bg-white/20 backdrop-blur-md"} w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold text-white shadow-md`}>
+              <div className={`absolute inset-0 bg-gradient-to-t ${s.dark ? "from-black/90 via-black/40" : "from-black/90 via-black/40"} to-transparent p-4 flex flex-col justify-between`}>
+                <div className={`${s.dark ? "bg-brand-green" : "bg-white/20 backdrop-blur-md"} w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold text-white shadow-md`}>
                   {s.id}
                 </div>
                 <span className="text-[10px] font-bold uppercase leading-tight text-white tracking-wide">
@@ -826,24 +832,24 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
 
       {/* Quick Inquiry Form */}
       <section id="contact" className="col-span-12 md:col-span-6 lg:col-span-3 bento-card">
-        <h3 className="font-bold text-lg uppercase text-slate-900 mb-6 tracking-tight">Quick Inquiry</h3>
+        <h3 className="font-bold text-lg uppercase text-black mb-6 tracking-tight">Quick Inquiry</h3>
         <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-          <input type="text" placeholder="Full Name" className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-orange/20 transition-all font-medium" />
-          <input type="email" placeholder="Email Address" className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-orange/20 transition-all font-medium" />
-          <textarea placeholder="Project Details" className="w-full h-24 text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-orange/20 transition-all font-medium resize-none"></textarea>
-          <button className="w-full bg-slate-900 text-white text-xs py-3 rounded-xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg">Send Message</button>
+          <input type="text" placeholder="Full Name" className="w-full text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium" />
+          <input type="email" placeholder="Email Address" className="w-full text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium" />
+          <textarea placeholder="Project Details" className="w-full h-24 text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium resize-none"></textarea>
+          <button className="w-full bg-black text-white text-xs py-3 rounded-xl font-bold hover:bg-brand-green transition-all active:scale-95 shadow-lg">Send Message</button>
         </form>
       </section>
 
       {/* Contact Info Card */}
-      <section className="col-span-12 md:col-span-6 lg:col-span-3 bento-card-dark bg-slate-900 text-white overflow-hidden relative">
+      <section className="col-span-12 md:col-span-6 lg:col-span-3 bento-card-dark bg-black text-white overflow-hidden relative border border-white/5">
         <div className="absolute top-0 right-0 p-8 opacity-10">
           <Phone size={120} />
         </div>
         <h3 className="font-bold text-lg uppercase mb-8 tracking-tight relative z-10">Direct Contact</h3>
         <div className="space-y-6 relative z-10">
           <div className="flex items-center gap-4 group cursor-pointer">
-            <div className="w-10 h-10 bg-brand-orange rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+            <div className="w-10 h-10 bg-brand-green rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
               <MapPin size={18} />
             </div>
             <div>
@@ -852,7 +858,7 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
             </div>
           </div>
           <div className="flex items-center gap-4 group cursor-pointer">
-            <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 transition-transform group-hover:scale-110 group-hover:bg-brand-orange group-hover:border-brand-orange">
+            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 transition-transform group-hover:scale-110 group-hover:bg-brand-green group-hover:border-brand-green">
               <Phone size={18} />
             </div>
             <div>
@@ -861,7 +867,7 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
             </div>
           </div>
           <div className="flex items-center gap-4 group cursor-pointer">
-            <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 transition-transform group-hover:scale-110 group-hover:bg-brand-orange group-hover:border-brand-orange">
+            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 transition-transform group-hover:scale-110 group-hover:bg-brand-green group-hover:border-brand-green">
               <Mail size={18} />
             </div>
             <div>
@@ -876,18 +882,18 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
       <section className="col-span-12 bg-white rounded-[2rem] p-8 md:p-12 border border-slate-200">
         <div className="grid md:grid-cols-3 gap-12">
           <div className="space-y-4">
-            <CheckCircle2 className="text-brand-orange" size={32} />
-            <h4 className="text-lg font-bold uppercase text-slate-900 tracking-tight">Craftsmanship</h4>
+            <CheckCircle2 className="text-brand-green" size={32} />
+            <h4 className="text-lg font-bold uppercase text-black tracking-tight">Craftsmanship</h4>
             <p className="text-slate-500 text-sm leading-relaxed">Our skilled artisans ensure every detail meets the highest industry standards with master-level precision.</p>
           </div>
           <div className="space-y-4">
-            <RefreshCw className="text-brand-orange" size={32} />
-            <h4 className="text-lg font-bold uppercase text-slate-900 tracking-tight">Agility</h4>
+            <RefreshCw className="text-brand-green" size={32} />
+            <h4 className="text-lg font-bold uppercase text-black tracking-tight">Agility</h4>
             <p className="text-slate-500 text-sm leading-relaxed">On-time project delivery refined by agile management cycles that respect your schedule and investment.</p>
           </div>
           <div className="space-y-4">
-            <Building2 className="text-brand-orange" size={32} />
-            <h4 className="text-lg font-bold uppercase text-slate-900 tracking-tight">Satisfaction</h4>
+            <Building2 className="text-brand-green" size={32} />
+            <h4 className="text-lg font-bold uppercase text-black tracking-tight">Satisfaction</h4>
             <p className="text-slate-500 text-sm leading-relaxed">Our projects aren't finished until our clients are completely happy. We build relationships, not just structures.</p>
           </div>
         </div>
@@ -903,11 +909,8 @@ const Footer = ({ onAdminClick }: { onAdminClick: () => void }) => {
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Social Media</span>
           <div className="flex gap-8">
-            {[
-              { name: "Facebook", link: "https://www.facebook.com/profile.php?id=100009546434745" },
-              { name: "TikTok", link: "https://vm.tiktok.com/ZS9NhdvxML9CH-B48Fw/" }
-            ].map((social, idx) => (
-              <a key={idx} href={social.link} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-brand-orange transition-all font-bold uppercase tracking-[0.15em] text-[10px] active:scale-95" aria-label={social.name}>
+            {socials.map((social, idx) => (
+              <a key={idx} href={social.link} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-brand-green transition-all font-bold uppercase tracking-[0.15em] text-[10px] active:scale-95" aria-label={social.name}>
                 {social.name}
               </a>
             ))}
@@ -994,7 +997,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 selection:bg-brand-orange/30">
+    <div className="min-h-screen bg-white selection:bg-brand-green/30">
       <Navbar />
       <main className="container-custom pb-12">
         {currentView === 'home' && <BentoHero onCategoryClick={handleCategoryClick} />}
