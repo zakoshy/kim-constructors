@@ -100,24 +100,24 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-4 left-0 right-0 z-50 px-4">
+    <nav className="absolute top-4 left-0 right-0 z-50 px-4">
       <div className={`container-custom transition-all duration-300 rounded-2xl border border-slate-200 flex justify-between items-center px-6 py-4 ${
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-white shadow-sm"
+        isScrolled ? "bg-white shadow-sm" : "bg-white shadow-sm"
       }`}>
-        <a href="#" className="flex items-center gap-4 group">
-          <div className="w-28 h-28 relative overflow-hidden rounded-full border-4 border-slate-100 group-hover:border-brand-green transition-all duration-300 bg-white shadow-md -my-8">
+        <a href="#" className="flex items-center gap-3 md:gap-4 group">
+          <div className="w-16 h-16 md:w-28 md:h-28 relative overflow-hidden rounded-full border-4 border-slate-100 group-hover:border-brand-green transition-all duration-300 bg-white shadow-md -my-4 md:-my-8 shrink-0">
             <img 
-              src="/logo.jpeg" 
+              src="/logo.png" 
               alt="Kim Contractors Logo" 
               referrerPolicy="no-referrer"
-              className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-700" 
+              className="w-full h-full object-contain p-1 md:p-2 group-hover:scale-110 transition-transform duration-700" 
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-3xl font-display font-extrabold uppercase tracking-tighter text-black leading-none">
+            <span className="text-xl md:text-3xl font-display font-extrabold uppercase tracking-tighter text-black leading-none">
               Kim <span className="text-brand-green">Contractors</span>
             </span>
-            <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-500 mt-1">Excellence in Construction</span>
+            <span className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold text-slate-500 mt-0.5 md:mt-1">Excellence in Construction</span>
           </div>
         </a>
 
@@ -673,14 +673,16 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {images.map(img => (
-                      <div key={img.id} className="group relative aspect-[4/5] rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm transition-all hover:shadow-xl">
-                        <img src={img.url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={img.alt} />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6">
+                      <div key={img.id} className="group relative aspect-[4/5] rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm transition-all hover:shadow-xl bg-slate-50">
+                        <img src={img.url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={img.alt} />
+                        
+                        {/* Always visible delete button overlay on mobile, hover on desktop */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
                           <button 
                             onClick={() => setDeleteConfirm({ id: img.id, url: img.url })}
-                            className="w-full py-4 bg-white text-red-600 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-2xl active:scale-95"
+                            className="w-full py-3 bg-white text-red-600 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-lg active:scale-95 text-xs"
                           >
-                            <Trash2 size={18} /> Remove Asset
+                            <Trash2 size={16} /> Delete Image
                           </button>
                         </div>
                       </div>
