@@ -726,6 +726,21 @@ const AdminPanel = ({ onExit, isAuthorized, setIsAuthorized }: { onExit: () => v
 };
 
 const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCategory) => void }) => {
+  const [inquiryName, setInquiryName] = useState("");
+  const [inquiryEmail, setInquiryEmail] = useState("");
+  const [inquiryDetails, setInquiryDetails] = useState("");
+
+  const handleInquirySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`New Project Inquiry from ${inquiryName}`);
+    const body = encodeURIComponent(
+      `Customer Name: ${inquiryName}\n` +
+      `Customer Email: ${inquiryEmail}\n\n` +
+      `Project Description:\n${inquiryDetails}`
+    );
+    window.location.href = `mailto:kimcontractors2@gmail.com?subject=${subject}&body=${body}`;
+  };
+
   return (
     <div className="grid grid-cols-12 gap-4 auto-rows-min mt-24">
       {/* Hero Body */}
@@ -835,11 +850,31 @@ const BentoHero = ({ onCategoryClick }: { onCategoryClick: (cat: ExpertiseCatego
       {/* Quick Inquiry Form */}
       <section id="contact" className="col-span-12 md:col-span-6 lg:col-span-3 bento-card">
         <h3 className="font-bold text-lg uppercase text-black mb-6 tracking-tight">Quick Inquiry</h3>
-        <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-          <input type="text" placeholder="Full Name" className="w-full text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium" />
-          <input type="email" placeholder="Email Address" className="w-full text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium" />
-          <textarea placeholder="Project Details" className="w-full h-24 text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium resize-none"></textarea>
-          <button className="w-full bg-black text-white text-xs py-3 rounded-xl font-bold hover:bg-brand-green transition-all active:scale-95 shadow-lg">Send Message</button>
+        <form className="space-y-3" onSubmit={handleInquirySubmit}>
+          <input 
+            type="text" 
+            placeholder="Full Name" 
+            className="w-full text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium"
+            value={inquiryName}
+            onChange={(e) => setInquiryName(e.target.value)}
+            required
+          />
+          <input 
+            type="email" 
+            placeholder="Email Address" 
+            className="w-full text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium"
+            value={inquiryEmail}
+            onChange={(e) => setInquiryEmail(e.target.value)}
+            required
+          />
+          <textarea 
+            placeholder="Project Details" 
+            className="w-full h-24 text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-green/20 transition-all font-medium resize-none"
+            value={inquiryDetails}
+            onChange={(e) => setInquiryDetails(e.target.value)}
+            required
+          ></textarea>
+          <button type="submit" className="w-full bg-black text-white text-xs py-3 rounded-xl font-bold hover:bg-brand-green transition-all active:scale-95 shadow-lg">Send Message</button>
         </form>
       </section>
 
